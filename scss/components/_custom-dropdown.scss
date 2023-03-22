@@ -1,0 +1,30 @@
+.toggleDrop{
+  background-color: transparent !important;
+  border: none;
+  box-shadow: none !important;
+  color: #FFFFFFA0;
+}
+
+.dropMenu{
+  background-color: #1f1b2d;
+  border: none;
+  color: white;
+}
+
+.itemDrop{
+  color: #FFFFFFA6;
+
+}
+
+.toggleDrop.btn-primary:hover{
+background-color: transparent;
+}
+
+.itemDrop.dropdown-item:hover{
+  color: white;
+}
+
+.dropMenu input.mx-3.my-2.w-auto.form-control{
+  background-color: #36353a;
+  border-radius: 30px;
+}
