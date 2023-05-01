@@ -43,7 +43,7 @@ const CatalogPage = () => {
   const [modelShow, setModelShow] = useState(false)
   const [signupShow, setSignupShow] = useState(false)
   const [filters, setFilters] = useState({})
-  const [carFilter, setCarFilter] = useState({})
+  const [carFilter, setCarFilter] = useState({ createdOn: 'DESC' })
   const [selected, setSelected] = useState([])
   const [addShow, setAddShow] = useState(false)
   const [showError, setShowError] = useState([])
@@ -56,8 +56,9 @@ const CatalogPage = () => {
   const [newData, setNewData] = useState([])
   const [where, setWhere] = useState({})
 
+  const { push, query } = useRouter()
+
   useEffect(() => {
-    console.log(productData?.length, count)
     if (productData?.length <= count) {
       setHasMore(true)
     }
@@ -121,6 +122,7 @@ const CatalogPage = () => {
 
   useEffect(() => {
     setLoading(true)
+
     client
       .query({
         query: ADVERTISES,
@@ -128,6 +130,7 @@ const CatalogPage = () => {
           where: searchObj ? JSON.parse(searchObj) : where,
           take: 10,
           skip: count > 10 ? skip : 0,
+          order: [carFilter],
         },
         fetchPolicy: 'network-only',
       })
@@ -145,7 +148,7 @@ const CatalogPage = () => {
       .catch((err) => setLoading(false))
       .finally(() => setLoading(false))
     setSearchObj(undefined)
-  }, [skip, where])
+  }, [skip, where, carFilter])
 
   if (specificationsError || countriesError || brandsError)
     return <NotFoundPage />
@@ -177,32 +180,31 @@ const CatalogPage = () => {
         setShowError(err?.networkError?.result?.errors)
       })
   }
-
   const handleChange = (e) => {
     const { name, value } = e.target
     setProductData([])
-    console.log(name, value)
+    // console.log(name, value)
 
-    // router.replace(`/car-finder/catalog?view=grid&${name}=${value}`)
+    router.replace(`/car-finder/catalog?view=grid&${name}=${value}`)
 
     const queryParam = `${name}=${value}`
     const newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?${queryParam}`
     window.history.pushState({ path: newUrl }, '', newUrl)
 
-    if (name === 'model') {
-      setWhere({
-        product: {
-          productSpecifications: {
-            some: {
-              specificationValue: {
-                slug: { eq: value },
-                specification: { slug: { contains: 'model' } },
-              },
-            },
-          },
-        },
-      })
-    }
+    // if (name === 'model') {
+    //   setWhere({
+    //     product: {
+    //       productSpecifications: {
+    //         some: {
+    //           specificationValue: {
+    //             slug: { eq: value },
+    //             specification: { slug: { contains: 'model' } },
+    //           },
+    //         },
+    //       },
+    //     },
+    //   })
+    // }
 
     if (newSearch) {
       if (newSearch === 'new') {
@@ -222,14 +224,14 @@ const CatalogPage = () => {
       }
     }
 
-    if (name === 'brand') {
-      setWhere((old) => {
-        return {
-          ...old,
-          product: { brand: { slug: { contains: value } } },
-        }
-      })
-    }
+    // if (name === 'brand') {
+    //   setWhere((old) => {
+    //     return {
+    //       ...old,
+    //       product: { brand: { slug: { contains: value } } },
+    //     }
+    //   })
+    // }
 
     if (name === 'modelYear') {
       setWhere((old) => {
@@ -269,37 +271,37 @@ const CatalogPage = () => {
       })
     }
 
-    if (name === 'minimum-required-age') {
-      setWhere((old) => {
-        return {
-          ...old,
-          advertiseSpecifications: {
-            some: {
-              specificationValue: {
-                slug: { eq: value },
-                specification: { slug: { contains: 'minimum-required-age' } },
-              },
-            },
-          },
-        }
-      })
-    }
+    // if (name === 'minimum-required-age') {
+    //   setWhere((old) => {
+    //     return {
+    //       ...old,
+    //       advertiseSpecifications: {
+    //         some: {
+    //           specificationValue: {
+    //             slug: { eq: value },
+    //             specification: { slug: { contains: 'minimum-required-age' } },
+    //           },
+    //         },
+    //       },
+    //     }
+    //   })
+    // }
 
-    if (name === 'doors') {
-      setWhere((old) => {
-        return {
-          ...old,
-          advertiseSpecifications: {
-            some: {
-              specificationValue: {
-                slug: { eq: value },
-                specification: { slug: { contains: 'doors' } },
-              },
-            },
-          },
-        }
-      })
-    }
+    // if (name === 'doors') {
+    //   setWhere((old) => {
+    //     return {
+    //       ...old,
+    //       advertiseSpecifications: {
+    //         some: {
+    //           specificationValue: {
+    //             slug: { eq: value },
+    //             specification: { slug: { contains: 'doors' } },
+    //           },
+    //         },
+    //       },
+    //     }
+    //   })
+    // }
 
     if (name === 'AirportDelivery') {
       setWhere((old) => {
@@ -388,21 +390,21 @@ const CatalogPage = () => {
       })
     }
 
-    if (name === 'free-delivery') {
-      setWhere((old) => {
-        return {
-          ...old,
-          advertiseSpecifications: {
-            some: {
-              specificationValue: {
-                slug: { eq: value },
-                specification: { slug: { contains: 'free-delivery' } },
-              },
-            },
-          },
-        }
-      })
-    }
+    // if (name === 'free-delivery') {
+    //   setWhere((old) => {
+    //     return {
+    //       ...old,
+    //       advertiseSpecifications: {
+    //         some: {
+    //           specificationValue: {
+    //             slug: { eq: value },
+    //             specification: { slug: { contains: 'free-delivery' } },
+    //           },
+    //         },
+    //       },
+    //     }
+    //   })
+    // }
 
     if (name === 'fuelType') {
       setWhere((old) => {
@@ -415,21 +417,21 @@ const CatalogPage = () => {
       })
     }
 
-    if (name === 'gcc-specs') {
-      setWhere((old) => {
-        return {
-          ...old,
-          advertiseSpecifications: {
-            some: {
-              specificationValue: {
-                slug: { eq: value },
-                specification: { slug: { contains: 'gcc-specs' } },
-              },
-            },
-          },
-        }
-      })
-    }
+    // if (name === 'gcc-specs') {
+    //   setWhere((old) => {
+    //     return {
+    //       ...old,
+    //       advertiseSpecifications: {
+    //         some: {
+    //           specificationValue: {
+    //             slug: { eq: value },
+    //             specification: { slug: { contains: 'gcc-specs' } },
+    //           },
+    //         },
+    //       },
+    //     }
+    //   })
+    // }
 
     if (name === 'insurance-included') {
       setWhere((old) => {
@@ -447,16 +449,16 @@ const CatalogPage = () => {
       })
     }
 
-    if (name === 'InternationalSpecs') {
-      setWhere((old) => {
-        return {
-          ...old,
-          InternationalSpecs: {
-            contains: value,
-          },
-        }
-      })
-    }
+    // if (name === 'InternationalSpecs') {
+    //   setWhere((old) => {
+    //     return {
+    //       ...old,
+    //       InternationalSpecs: {
+    //         contains: value,
+    //       },
+    //     }
+    //   })
+    // }
 
     if (name === 'LanguagesSpoken') {
       setWhere((old) => {
@@ -469,21 +471,21 @@ const CatalogPage = () => {
       })
     }
 
-    if (name === 'Mileages') {
-      setWhere((old) => {
-        return {
-          ...old,
-          advertiseSpecifications: {
-            some: {
-              specificationValue: {
-                slug: { eq: value },
-                specification: { slug: { contains: 'mileages' } },
-              },
-            },
-          },
-        }
-      })
-    }
+    // if (name === 'Mileages') {
+    //   setWhere((old) => {
+    //     return {
+    //       ...old,
+    //       advertiseSpecifications: {
+    //         some: {
+    //           specificationValue: {
+    //             slug: { eq: value },
+    //             specification: { slug: { contains: 'mileages' } },
+    //           },
+    //         },
+    //       },
+    //     }
+    //   })
+    // }
 
     if (name === 'minimum-days') {
       setWhere((old) => {
@@ -539,20 +541,21 @@ const CatalogPage = () => {
       })
     }
 
-    if (name === 'country') {
-      setWhere((old) => {
-        return {
-          ...old,
-          locationSpecifications: {
-            some: {
-              locationValue: {
-                country: { slug: { contains: value } },
-              },
-            },
-          },
-        }
-      })
-    }
+    // if (name === 'country') {
+    //   setWhere((old) => {
+    //     return {
+    //       ...old,
+    //       // locationSpecifications: {
+    //       //   some: {
+    //       //     locationValue: {
+    //       //       country: { slug: { contains: value } },
+    //       //     },
+    //       //   },
+    //       // },
+    //       country: { slug: { contains: value } },
+    //     }
+    //   })
+    // }
 
     if (name === 'area') {
       setWhere((old) => {
@@ -632,7 +635,7 @@ const CatalogPage = () => {
     } else if (value === 'priceHL') {
       setCarFilter({ price: 'DESC' })
     } else if (value === 'popular') {
-      setCarFilter({ popular: 'DESC' })
+      setCarFilter({ createdOn: 'ASC' })
     }
   }
 
@@ -923,7 +926,14 @@ const CatalogPage = () => {
                   <Form.Select
                     name='country'
                     defaultValue='any'
-                    onChange={handleChange}
+                    onChange={(e) =>
+                      setWhere((curr) => {
+                        return {
+                          ...curr,
+                          country: { slug: { contains: e.target.value } },
+                        }
+                      })
+                    }
                     className='form-select-light mb-2'
                   >
                     <option defaultValue value='country'>
@@ -968,7 +978,16 @@ const CatalogPage = () => {
                     name='brand'
                     defaultValue='any'
                     className='form-select-light mb-2'
-                    onChange={handleChange}
+                    onChange={(e) =>
+                      setWhere((old) => {
+                        return {
+                          ...old,
+                          product: {
+                            brand: { slug: { contains: e.target.value } },
+                          },
+                        }
+                      })
+                    }
                   >
                     <option defaultValue value='brand'>
                       Select Brand
@@ -986,7 +1005,20 @@ const CatalogPage = () => {
                     name='model'
                     defaultValue='any'
                     className='form-select-light mb-1'
-                    onChange={handleChange}
+                    onChange={(e) =>
+                      setWhere({
+                        product: {
+                          productSpecifications: {
+                            some: {
+                              specificationValue: {
+                                slug: { eq: e.target.value },
+                                specification: { slug: { contains: 'model' } },
+                              },
+                            },
+                          },
+                        },
+                      })
+                    }
                   >
                     <option defaultValue value='model'>
                       Select Model
@@ -1006,30 +1038,11 @@ const CatalogPage = () => {
                   <h3 className='h6 text-light pt-1'>Year</h3>
                   <div className='d-flex align-items-center'>
                     <Form.Select
-                      defaultValue='from'
-                      name='modelYear'
-                      className='form-select-light w-100'
-                      onChange={handleChange}
-                    >
-                      <option defaultValue value='year'>
-                        Select Year
-                      </option>
-                      {modelYear?.map((item, key) => {
-                        const { name, id } = item
-                        return (
-                          <option key={key} value={name}>
-                            {name}
-                          </option>
-                        )
-                      })}
-                    </Form.Select>
-                    <div className='mx-2'>&mdash;</div>
-                    <Form.Select
                       defaultValue='2019'
                       className='form-select-light w-100'
                     >
                       <option value='to' disabled>
-                        To
+                        Select Year
                       </option>
                       <option value='2022'>2022</option>
                       <option value='2021'>2021</option>
@@ -1039,6 +1052,42 @@ const CatalogPage = () => {
                       <option value='2017'>2017</option>
                       <option value='2016'>2016</option>
                       <option value='2015'>2015</option>
+                    </Form.Select>
+                    <div className='mx-2'>&mdash;</div>
+
+                    <Form.Select
+                      defaultValue='from'
+                      name='modelYear'
+                      className='form-select-light w-100'
+                      onChange={(e) =>
+                        setWhere((old) => {
+                          return {
+                            ...old,
+                            advertiseSpecifications: {
+                              some: {
+                                specificationValue: {
+                                  slug: { eq: e.target.value },
+                                  specification: {
+                                    slug: { contains: 'model-year' },
+                                  },
+                                },
+                              },
+                            },
+                          }
+                        })
+                      }
+                    >
+                      <option defaultValue value='year'>
+                        To
+                      </option>
+                      {modelYear?.map((item, key) => {
+                        const { name, id } = item
+                        return (
+                          <option key={key} value={name}>
+                            {name}
+                          </option>
+                        )
+                      })}
                     </Form.Select>
                   </div>
                 </div>
@@ -1226,7 +1275,23 @@ const CatalogPage = () => {
                   <Form.Select
                     name='MinimumRequiredAge'
                     defaultValue='any'
-                    onChange={handleChange}
+                    onChange={(e) =>
+                      setWhere((old) => {
+                        return {
+                          ...old,
+                          advertiseSpecifications: {
+                            some: {
+                              specificationValue: {
+                                slug: { eq: e.target.value },
+                                specification: {
+                                  slug: { contains: 'minimum-required-age' },
+                                },
+                              },
+                            },
+                          },
+                        }
+                      })
+                    }
                     className='form-select-light mb-2'
                   >
                     <option defaultValue value='age'>
@@ -1246,7 +1311,21 @@ const CatalogPage = () => {
                   <h3 className='h6 text-light'>Doors</h3>
                   <Form.Select
                     name='Doors'
-                    onChange={handleChange}
+                    onChange={(e) =>
+                      setWhere((old) => {
+                        return {
+                          ...old,
+                          advertiseSpecifications: {
+                            some: {
+                              specificationValue: {
+                                slug: { eq: e.target.value },
+                                specification: { slug: { contains: 'doors' } },
+                              },
+                            },
+                          },
+                        }
+                      })
+                    }
                     defaultValue='any'
                     className='form-select-light mb-2'
                   >
@@ -1328,7 +1407,21 @@ const CatalogPage = () => {
                   <Form.Select
                     name='bags'
                     defaultValue='any'
-                    onChange={handleChange}
+                    onChange={(e) =>
+                      setWhere((old) => {
+                        return {
+                          ...old,
+                          advertiseSpecifications: {
+                            some: {
+                              specificationValue: {
+                                slug: { eq: e.target.value },
+                                specification: { slug: { contains: 'bags' } },
+                              },
+                            },
+                          },
+                        }
+                      })
+                    }
                     className='form-select-light mb-2'
                   >
                     <option defaultValue value='bags'>
@@ -1413,7 +1506,23 @@ const CatalogPage = () => {
                         key={key}
                         type='radio'
                         name='EngineCapacity'
-                        onChange={handleChange}
+                        onChange={(e) => {
+                          setWhere((old) => {
+                            return {
+                              ...old,
+                              advertiseSpecifications: {
+                                some: {
+                                  specificationValue: {
+                                    slug: { eq: e.target.value },
+                                    specification: {
+                                      slug: { contains: 'engine-capacity' },
+                                    },
+                                  },
+                                },
+                              },
+                            }
+                          })
+                        }}
                         // key={indx}
                         // id={`fuelType-${indx}`}
                         value={slug}
@@ -1478,16 +1587,32 @@ const CatalogPage = () => {
                     style={{ maxHeight: '11rem' }}
                   >
                     {FreeDelivery?.map((item, key) => {
-                      const { name, id } = item
+                      const { name, id, slug } = item
                       return (
                         <Form.Check
                           key={key}
                           type='radio'
-                          onChange={handleChange}
+                          onChange={(e) =>
+                            setWhere((old) => {
+                              return {
+                                ...old,
+                                advertiseSpecifications: {
+                                  some: {
+                                    specificationValue: {
+                                      slug: { eq: e.target.value },
+                                      specification: {
+                                        slug: { contains: 'free-delivery' },
+                                      },
+                                    },
+                                  },
+                                },
+                              }
+                            })
+                          }
                           name='FreeDelivery'
                           // key={indx}
                           // id={`fuelType-${indx}`}
-                          value={id}
+                          value={slug}
                           // defaultChecked={checked}
                           label={
                             <>
@@ -1532,16 +1657,32 @@ const CatalogPage = () => {
                     style={{ maxHeight: '11rem' }}
                   >
                     {gccSpecs?.map((item, key) => {
-                      const { name, id } = item
+                      const { name, id, slug } = item
                       return (
                         <Form.Check
                           key={key}
                           type='radio'
                           name='gccSpecs'
-                          onChange={handleChange}
+                          onChange={(e) =>
+                            setWhere((old) => {
+                              return {
+                                ...old,
+                                advertiseSpecifications: {
+                                  some: {
+                                    specificationValue: {
+                                      slug: { eq: e.target.value },
+                                      specification: {
+                                        slug: { contains: 'gcc-specs' },
+                                      },
+                                    },
+                                  },
+                                },
+                              }
+                            })
+                          }
                           // key={indx}
                           // id={`fuelType-${indx}`}
-                          value={id}
+                          value={slug}
                           // defaultChecked={checked}
                           label={
                             <>
@@ -1592,16 +1733,37 @@ const CatalogPage = () => {
                     style={{ maxHeight: '11rem' }}
                   >
                     {InternationalSpecs?.map((item, key) => {
-                      const { name, id } = item
+                      const { name, id, slug } = item
                       return (
                         <Form.Check
                           key={key}
                           type='radio'
                           name='InternationalSpecs'
-                          onChange={handleChange}
+                          onChange={(e) =>
+                            setWhere((old) => {
+                              return {
+                                ...old,
+                                advertiseSpecifications: {
+                                  all: {
+                                    specificationValue: {
+                                      slug: { contains: e.target.value },
+                                      specification: {
+                                        slug: {
+                                          contains: 'international-specs',
+                                        },
+                                      },
+                                    },
+                                  },
+                                },
+                                // InternationalSpecs: {
+                                //   contains: e.target.value,
+                                // },
+                              }
+                            })
+                          }
                           // key={indx}
                           // id={`fuelType-${indx}`}
-                          value={id}
+                          value={slug}
                           // defaultChecked={checked}
                           label={
                             <>
@@ -1639,7 +1801,23 @@ const CatalogPage = () => {
                 <div className='pb-4 mb-2'>
                   <h3 className='h6 text-light'>Mileages</h3>
                   <Form.Select
-                    onChange={handleChange}
+                    onChange={(e) =>
+                      setWhere((old) => {
+                        return {
+                          ...old,
+                          advertiseSpecifications: {
+                            some: {
+                              specificationValue: {
+                                slug: { eq: e.target.value },
+                                specification: {
+                                  slug: { contains: 'mileages' },
+                                },
+                              },
+                            },
+                          },
+                        }
+                      })
+                    }
                     name='Mileages'
                     defaultValue='any'
                     className='form-select-light mb-2'
@@ -1660,7 +1838,23 @@ const CatalogPage = () => {
                 <div className='pb-4 mb-2'>
                   <h3 className='h6 text-light'>Minimum Days</h3>
                   <Form.Select
-                    onChange={handleChange}
+                    onChange={(e) =>
+                      setWhere((old) => {
+                        return {
+                          ...old,
+                          advertiseSpecifications: {
+                            some: {
+                              specificationValue: {
+                                slug: { eq: e.target.value },
+                                specification: {
+                                  slug: { contains: 'minimum-days' },
+                                },
+                              },
+                            },
+                          },
+                        }
+                      })
+                    }
                     name='MinimumDays'
                     defaultValue='any'
                     className='form-select-light mb-2'
@@ -1799,10 +1993,10 @@ const CatalogPage = () => {
                   className='d-none d-md-block border-end border-light'
                   style={{ height: '1.25rem' }}
                 />
-                <div className='d-none d-sm-block fw-bold text-light opacity-70 text-nowrap ps-md-4'>
+                {/* <div className='d-none d-sm-block fw-bold text-light opacity-70 text-nowrap ps-md-4'>
                   <i className='fi-switch-horizontal me-2'></i>
                   <span className='align-middle'>Compare (0)</span>
-                </div>
+                </div> */}
               </Form.Group>
               <Nav
                 activeKey={`/car-finder/catalog?view=${viewParam}`}
@@ -1873,17 +2067,17 @@ const CatalogPage = () => {
                           location={
                             car?.locationSpecifications[0]?.locationValue?.name
                           }
-                          checkbox={{
-                            label: 'Compare',
-                            props: {
-                              onChange: (e) =>
-                                e.target.checked
-                                  ? console.log('Car ADDED to comparison list!')
-                                  : console.log(
-                                      'Car REMOVED from comparison list!'
-                                    ),
-                            },
-                          }}
+                          // checkbox={{
+                          //   label: 'Compare',
+                          //   props: {
+                          //     onChange: (e) =>
+                          //       e.target.checked
+                          //         ? console.log('Car ADDED to comparison list!')
+                          //         : console.log(
+                          //             'Car REMOVED from comparison list!'
+                          //           ),
+                          //   },
+                          // }}
                           badges={car.badges}
                           wishlistButton={{
                             tooltip: 'Add to Wishlist',
@@ -1964,19 +2158,19 @@ const CatalogPage = () => {
                               car?.locationSpecifications[0]?.locationValue
                                 ?.name
                             }
-                            checkbox={{
-                              label: 'Compare',
-                              props: {
-                                onChange: (e) =>
-                                  e.target.checked
-                                    ? console.log(
-                                        'Car ADDED to comparison list!'
-                                      )
-                                    : console.log(
-                                        'Car REMOVED from comparison list!'
-                                      ),
-                              },
-                            }}
+                            // checkbox={{
+                            //   label: 'Compare',
+                            //   props: {
+                            //     onChange: (e) =>
+                            //       e.target.checked
+                            //         ? console.log(
+                            //             'Car ADDED to comparison list!'
+                            //           )
+                            //         : console.log(
+                            //             'Car REMOVED from comparison list!'
+                            //           ),
+                            //   },
+                            // }}
                             badges={car.badges}
                             wishlistButton={{
                               tooltip: 'Add to Wishlist',
@@ -2051,7 +2245,11 @@ const CatalogPage = () => {
                   <i className='fi-arrows-sort mt-n1 me-2'></i>
                   Sort by:
                 </Form.Label>
-                <Form.Select size='sm' className='form-select-light me-sm-4'>
+                <Form.Select
+                  size='sm'
+                  className='form-select-light me-sm-4'
+                  onChange={selectOffer}
+                >
                   <option value='newest'>Newest</option>
                   <option value='popular'>Popular</option>
                   <option value='priceLH'>Price: Low - High</option>
@@ -2061,10 +2259,10 @@ const CatalogPage = () => {
                   className='d-none d-md-block border-end border-light'
                   style={{ height: '1.25rem' }}
                 />
-                <div className='d-none d-sm-block fw-bold text-light opacity-70 text-nowrap ps-md-4'>
+                {/* <div className='d-none d-sm-block fw-bold text-light opacity-70 text-nowrap ps-md-4'>
                   <i className='fi-switch-horizontal me-2'></i>
                   <span className='align-middle'>Compare (0)</span>
-                </div>
+                </div> */}
               </Form.Group>
             </div>
           </Col>

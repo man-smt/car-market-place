@@ -67,15 +67,15 @@ const AccountWishlistPage = () => {
                 year={item.year}
                 price={item.price}
                 location={item.location}
-                checkbox={{
-                  label: 'Compare',
-                  props: {
-                    onChange: (e) =>
-                      e.target.checked
-                        ? console.log('Car ADDED to comparison list!')
-                        : console.log('Car REMOVED from comparison list!'),
-                  },
-                }}
+                // checkbox={{
+                //   label: 'Compare',
+                //   props: {
+                //     onChange: (e) =>
+                //       e.target.checked
+                //         ? console.log('Car ADDED to comparison list!')
+                //         : console.log('Car REMOVED from comparison list!'),
+                //   },
+                // }}
                 badges={item.badges}
                 wishlistButton={{
                   tooltip: 'Remove from Wishlist',

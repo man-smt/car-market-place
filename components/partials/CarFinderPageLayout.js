@@ -1,3 +1,4 @@
+import React from 'react'
 import { useContext, useEffect, useState } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
@@ -21,8 +22,11 @@ import { GET_LOGIN_USER } from '../../graphql/Queries'
 import client from '../../apollo'
 import { isEmpty } from 'lodash'
 import { AppContext } from '../../provider/AppContext'
+import Form from 'react-bootstrap/Form'
 
 const CarFinderPageLayout = (props) => {
+  const [searchSelectData, setSearchSelectData] = useState({})
+
   const token = localStorage.getItem('token')
 
   const { state, dispatch } = useContext(AppContext)
@@ -67,6 +71,58 @@ const CarFinderPageLayout = (props) => {
     setLoginUser({})
     localStorage.removeItem('token')
   }
+
+  let obj = {}
+
+  const handleSelect = (eventKey, e) => {
+    console.log({ eventKey, e })
+    obj = { ...searchSelectData }
+    // console.log(e.target.textContent)
+    // setDropData(e.target.textContent)
+    obj['location'] = eventKey?.toLowerCase()
+    setSearchSelectData(obj)
+  }
+
+  const CustomMenu = React.forwardRef(
+    ({ children, style, className, 'aria-labelledby': labeledBy }, ref) => {
+      const [value, setValue] = useState('')
+
+      return (
+        <div
+          ref={ref}
+          style={style}
+          className={className}
+          aria-labelledby={labeledBy}
+        >
+          <Form.Control
+            autoFocus
+            className='mx-3 my-2 w-auto'
+            placeholder='Type to filter...'
+            onChange={(e) => setValue(e.target.value)}
+            value={value}
+          />
+          {/* !value || child.props.children.startsWith(value) */}
+          <ul className='list-unstyled'>
+            {React.Children.toArray(children).filter(
+              (child) =>
+                !value ||
+                child?.props?.children[1].toLowerCase().startsWith(value)
+            )}
+          </ul>
+        </div>
+      )
+    }
+  )
+
+  const options = [
+    [null, 'Dallas'], // First element is an icon class, null means no icon
+    [null, 'Chicago'],
+    [null, 'Houston'],
+    [null, 'Las Vegas'],
+    [null, 'Los Angeles'],
+    [null, 'New York'],
+    [null, 'San Francisco'],
+  ]
 
   function parseJwt(token) {
     console.log(token)
@@ -452,7 +508,7 @@ const CarFinderPageLayout = (props) => {
               </Dropdown>
 
               {/* Location switcher */}
-              <Dropdown>
+              {/* <Dropdown>
                 <Dropdown.Toggle variant='light btn-link btn-sm fw-normal shadow-none py-2 pe-2'>
                   <i className='fi-map-pin me-2'></i>
                   New York
@@ -469,6 +525,36 @@ const CarFinderPageLayout = (props) => {
                     Los Angeles
                   </Dropdown.Item>
                   <Dropdown.Item eventKey='san-diego'>San Diego</Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown> */}
+              <Dropdown onSelect={handleSelect}>
+                <Dropdown.Toggle
+                  className='toggleDrop'
+                  name='location'
+                  id='dropdown-custom-components'
+                >
+                  <i className='fi-map-pin' style={{ marginRight: '10px' }}></i>
+                  {searchSelectData['location']
+                    ? searchSelectData['location']
+                    : 'Location'}
+                </Dropdown.Toggle>
+                <Dropdown.Menu as={CustomMenu} className='dropMenu'>
+                  {options
+                    ? options.map((option, indx) => (
+                        <Dropdown.Item
+                          key={indx}
+                          eventKey={option[1]}
+                          className='itemDrop'
+                        >
+                          {option[0] && (
+                            <i
+                              className={`${option[0]} fs-lg opacity-60 me-2`}
+                            ></i>
+                          )}
+                          {option[1]}
+                        </Dropdown.Item>
+                      ))
+                    : ''}
                 </Dropdown.Menu>
               </Dropdown>
             </div>

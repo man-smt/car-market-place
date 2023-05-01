@@ -60,9 +60,11 @@ const HomePage = ({ name }) => {
   const searchSpecification = () => {
     let searchObj = {}
     let array = []
+
     if (searchData) {
       array.push(searchData)
     }
+
     if (searchSelectData?.model) {
       array.push(searchSelectData?.model)
     }
@@ -81,6 +83,7 @@ const HomePage = ({ name }) => {
     } else {
       delete searchObj?.product
     }
+
     if (searchSelectData?.location) {
       searchObj['locationSpecifications'] = {
         some: {
@@ -100,6 +103,26 @@ const HomePage = ({ name }) => {
           })
         : delete searchObj.body_type
     }
+
+    // if (searchData) {
+    //   searchObj.keyword = searchData
+    // }
+
+    // if (searchSelectData?.brand) {
+    //   searchObj.brand = searchSelectData?.brand
+    // }
+
+    // if (searchSelectData?.model) {
+    //   searchObj.model = searchSelectData?.model
+    // }
+
+    // if (searchSelectData?.body_type) {
+    //   searchObj.body_type = searchSelectData?.body_type
+    // }
+
+    // if (searchSelectData?.location) {
+    //   searchObj.location = searchSelectData?.location
+    // }
 
     // if (!isEmpty(searchSelectData)) {
     //   searchSelectData?.brand
@@ -134,7 +157,6 @@ const HomePage = ({ name }) => {
     //     ? (searchObj['location'] = { contains: searchSelectData.location })
     //     : delete searchObj.location
     // }
-    console.log(searchObj)
     router.push(
       `/car-finder/catalog?view=grid&searchObj=${JSON.stringify(searchObj)}`
     )
@@ -597,15 +619,15 @@ const HomePage = ({ name }) => {
               year='2015'
               price='$25,800'
               location='New York'
-              checkbox={{
-                label: 'Compare',
-                props: {
-                  onChange: (e) =>
-                    e.target.checked
-                      ? console.log('Car ADDED to comparison list!')
-                      : console.log('Car REMOVED from comparison list!'),
-                },
-              }}
+              // checkbox={{
+              //   label: 'Compare',
+              //   props: {
+              //     onChange: (e) =>
+              //       e.target.checked
+              //         ? console.log('Car ADDED to comparison list!')
+              //         : console.log('Car REMOVED from comparison list!'),
+              //   },
+              // }}
               badges={[
                 ['info', 'Used'],
                 ['success', 'Certified'],
@@ -636,15 +658,15 @@ const HomePage = ({ name }) => {
               year='1995'
               price='$24,000'
               location='Chicago'
-              checkbox={{
-                label: 'Compare',
-                props: {
-                  onChange: (e) =>
-                    e.target.checked
-                      ? console.log('Car ADDED to comparison list!')
-                      : console.log('Car REMOVED from comparison list!'),
-                },
-              }}
+              // checkbox={{
+              //   label: 'Compare',
+              //   props: {
+              //     onChange: (e) =>
+              //       e.target.checked
+              //         ? console.log('Car ADDED to comparison list!')
+              //         : console.log('Car REMOVED from comparison list!'),
+              //   },
+              // }}
               badges={[['info', 'Used']]}
               wishlistButton={{
                 tooltip: 'Add to Wishlist',
@@ -671,15 +693,15 @@ const HomePage = ({ name }) => {
               year='2018'
               price='$43,500'
               location='San Francisco'
-              checkbox={{
-                label: 'Compare',
-                props: {
-                  onChange: (e) =>
-                    e.target.checked
-                      ? console.log('Car ADDED to comparison list!')
-                      : console.log('Car REMOVED from comparison list!'),
-                },
-              }}
+              // checkbox={{
+              //   label: 'Compare',
+              //   props: {
+              //     onChange: (e) =>
+              //       e.target.checked
+              //         ? console.log('Car ADDED to comparison list!')
+              //         : console.log('Car REMOVED from comparison list!'),
+              //   },
+              // }}
               badges={[['danger', 'New']]}
               wishlistButton={{
                 tooltip: 'Add to Wishlist',
@@ -913,15 +935,15 @@ const HomePage = ({ name }) => {
                   year={car.year}
                   price={car.price}
                   location={car.location}
-                  checkbox={{
-                    label: 'Compare',
-                    props: {
-                      onChange: (e) =>
-                        e.target.checked
-                          ? console.log('Car ADDED to comparison list!')
-                          : console.log('Car REMOVED from comparison list!'),
-                    },
-                  }}
+                  // checkbox={{
+                  //   label: 'Compare',
+                  //   props: {
+                  //     onChange: (e) =>
+                  //       e.target.checked
+                  //         ? console.log('Car ADDED to comparison list!')
+                  //         : console.log('Car REMOVED from comparison list!'),
+                  //   },
+                  // }}
                   badges={car.badges}
                   wishlistButton={{
                     tooltip: 'Add to Wishlist',

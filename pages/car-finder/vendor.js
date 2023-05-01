@@ -53,6 +53,8 @@ const VendorPage = () => {
     error,
   } = useQuery(OFFERS, { variables: { order: offerFilter, where: {} } })
 
+  console.log(offerFilter, 'offerFilter')
+
   const {
     data: carData,
     loading: CarLoading,
@@ -357,15 +359,15 @@ const VendorPage = () => {
                     year={car.year}
                     price={car.price}
                     location={car.location}
-                    checkbox={{
-                      label: 'Compare',
-                      props: {
-                        onChange: (e) =>
-                          e.target.checked
-                            ? console.log('Car ADDED to comparison list!')
-                            : console.log('Car REMOVED from comparison list!'),
-                      },
-                    }}
+                    // checkbox={{
+                    //   label: 'Compare',
+                    //   props: {
+                    //     onChange: (e) =>
+                    //       e.target.checked
+                    //         ? console.log('Car ADDED to comparison list!')
+                    //         : console.log('Car REMOVED from comparison list!'),
+                    //   },
+                    // }}
                     badges={car.badges}
                     wishlistButton={{
                       tooltip: 'Add to Wishlist',
@@ -717,15 +719,15 @@ const VendorPage = () => {
                     year={car.year}
                     price={car.price}
                     location={car.location}
-                    checkbox={{
-                      label: 'Compare',
-                      props: {
-                        onChange: (e) =>
-                          e.target.checked
-                            ? console.log('Car ADDED to comparison list!')
-                            : console.log('Car REMOVED from comparison list!'),
-                      },
-                    }}
+                    // checkbox={{
+                    //   label: 'Compare',
+                    //   props: {
+                    //     onChange: (e) =>
+                    //       e.target.checked
+                    //         ? console.log('Car ADDED to comparison list!')
+                    //         : console.log('Car REMOVED from comparison list!'),
+                    //   },
+                    // }}
                     badges={car.badges}
                     wishlistButton={{
                       tooltip: 'Add to Wishlist',
