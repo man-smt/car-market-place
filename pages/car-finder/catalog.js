@@ -32,11 +32,8 @@ import InfiniteScroll from 'react-infinite-scroll-component'
 
 const CatalogPage = () => {
   // Add extra class to body
-
   const router = useRouter()
-
-  const [searchObj, setSearchObj] = useState(router.query.searchObj)
-
+  const searchObj = localStorage.getItem('searchObj')
   const newSearch = router.query.newSearch
 
   const [show, setShow] = useState(false)
@@ -47,7 +44,6 @@ const CatalogPage = () => {
   const [selected, setSelected] = useState([])
   const [addShow, setAddShow] = useState(false)
   const [showError, setShowError] = useState([])
-
   const [hasMore, setHasMore] = useState(false)
   const [loading, setLoading] = useState(false)
   const [skip, setSkip] = useState(0)
@@ -55,8 +51,6 @@ const CatalogPage = () => {
   const [productData, setProductData] = useState([])
   const [newData, setNewData] = useState([])
   const [where, setWhere] = useState({})
-
-  const { push, query } = useRouter()
 
   useEffect(() => {
     if (productData?.length <= count) {
@@ -134,6 +128,7 @@ const CatalogPage = () => {
         },
         fetchPolicy: 'network-only',
       })
+
       .then((res) => {
         setProductData((curr) => {
           return [...res.data.advertises.items]
@@ -144,10 +139,10 @@ const CatalogPage = () => {
         //   product['href'] = `/car-finder/${product?.iD}`
         // })
         setLoading(false)
+        localStorage.removeItem('searchObj')
       })
       .catch((err) => setLoading(false))
       .finally(() => setLoading(false))
-    setSearchObj(undefined)
   }, [skip, where, carFilter])
 
   if (specificationsError || countriesError || brandsError)
@@ -190,6 +185,8 @@ const CatalogPage = () => {
     const queryParam = `${name}=${value}`
     const newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?${queryParam}`
     window.history.pushState({ path: newUrl }, '', newUrl)
+
+    console.log(queryParam)
 
     // if (name === 'model') {
     //   setWhere({
@@ -1779,7 +1776,23 @@ const CatalogPage = () => {
                 <div className='pb-4 mb-2'>
                   <h3 className='h6 text-light'>Languages Spoken</h3>
                   <Form.Select
-                    onChange={handleChange}
+                    onChange={(e) =>
+                      setWhere((old) => {
+                        return {
+                          ...old,
+                          advertiseSpecifications: {
+                            some: {
+                              specificationValue: {
+                                slug: { eq: e.target.value },
+                                specification: {
+                                  slug: { contains: 'languages-spoken' },
+                                },
+                              },
+                            },
+                          },
+                        }
+                      })
+                    }
                     name='LanguagesSpoken'
                     defaultValue='any'
                     className='form-select-light mb-2'
@@ -1905,7 +1918,23 @@ const CatalogPage = () => {
                 <div className='pb-4 mb-2'>
                   <h3 className='h6 text-light'>Time Sheets</h3>
                   <Form.Select
-                    onChange={handleChange}
+                    onChange={(e) =>
+                      setWhere((old) => {
+                        return {
+                          ...old,
+                          advertiseSpecifications: {
+                            some: {
+                              specificationValue: {
+                                slug: { eq: e.target.value },
+                                specification: {
+                                  slug: { contains: 'time-sheets' },
+                                },
+                              },
+                            },
+                          },
+                        }
+                      })
+                    }
                     name='TimeSheets'
                     defaultValue='any'
                     className='form-select-light mb-2'
@@ -1914,9 +1943,9 @@ const CatalogPage = () => {
                       Select Time Sheet
                     </option>
                     {TimeSheets?.map((item, key) => {
-                      const { name, id } = item
+                      const { name, id, slug } = item
                       return (
-                        <option key={key} value={id}>
+                        <option key={key} value={slug}>
                           {name}
                         </option>
                       )
@@ -1926,7 +1955,23 @@ const CatalogPage = () => {
                 <div className='pb-4 mb-2'>
                   <h3 className='h6 text-light'>Vat</h3>
                   <Form.Select
-                    onChange={handleChange}
+                    onChange={(e) =>
+                      setWhere((old) => {
+                        return {
+                          ...old,
+                          advertiseSpecifications: {
+                            some: {
+                              specificationValue: {
+                                slug: { eq: e.target.value },
+                                specification: {
+                                  slug: { contains: 'vat' },
+                                },
+                              },
+                            },
+                          },
+                        }
+                      })
+                    }
                     name='Vat'
                     defaultValue='any'
                     className='form-select-light mb-2'
@@ -1935,6 +1980,7 @@ const CatalogPage = () => {
                       Select Vat
                     </option>
                     {Vat?.map((item, key) => {
+                      console.log(Vat, 'vat')
                       const { name, id, slug } = item
                       return (
                         <option key={key} value={slug}>

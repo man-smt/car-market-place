@@ -124,6 +124,8 @@ const HomePage = ({ name }) => {
     //   searchObj.location = searchSelectData?.location
     // }
 
+    // console.log(searchObj, 'searchObj')
+
     // if (!isEmpty(searchSelectData)) {
     //   searchSelectData?.brand
     //     ? { product: { brand: { slug: { contains: searchSelectData.brand } } } }
@@ -157,9 +159,8 @@ const HomePage = ({ name }) => {
     //     ? (searchObj['location'] = { contains: searchSelectData.location })
     //     : delete searchObj.location
     // }
-    router.push(
-      `/car-finder/catalog?view=grid&searchObj=${JSON.stringify(searchObj)}`
-    )
+    localStorage.setItem('searchObj', JSON.stringify(searchObj))
+    router.push(`/car-finder/catalog?view=grid`)
   }
   // Categories (body types) array
   const categories = [
