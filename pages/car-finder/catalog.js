@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/router'
 import CarFinderPageLayout from '../../components/partials/CarFinderPageLayout'
 import Link from 'next/link'
@@ -29,8 +29,9 @@ import { ADD_FAVORITE } from '../../graphql/Mutations'
 import { get, isEmpty, sumBy } from 'lodash'
 import { Alert, Spinner } from 'react-bootstrap'
 import InfiniteScroll from 'react-infinite-scroll-component'
+import { previewData } from 'next/dist/client/components/headers'
 
-const CatalogPage = () => {
+const CatalogPage = (props) => {
   // Add extra class to body
   const router = useRouter()
   const searchObj = localStorage.getItem('searchObj')
@@ -115,8 +116,8 @@ const CatalogPage = () => {
   // }, [searchObj])
 
   useEffect(() => {
+    // localStorage.removeItem('searchObjCounty')
     setLoading(true)
-
     client
       .query({
         query: ADVERTISES,
@@ -139,11 +140,11 @@ const CatalogPage = () => {
         //   product['href'] = `/car-finder/${product?.iD}`
         // })
         setLoading(false)
-        localStorage.removeItem('searchObj')
+        // localStorage.removeItem('searchObj')
       })
       .catch((err) => setLoading(false))
       .finally(() => setLoading(false))
-  }, [skip, where, carFilter])
+  }, [skip, carFilter, where])
 
   if (specificationsError || countriesError || brandsError)
     return <NotFoundPage />
@@ -167,7 +168,6 @@ const CatalogPage = () => {
     client
       .mutate({ mutation: ADD_FAVORITE, variables: { input: favoriteDataObj } })
       .then((res) => {
-        console.log(res.data)
         router.push('/car-finder/account-wishlist')
       })
       .catch((err) => {
@@ -175,18 +175,19 @@ const CatalogPage = () => {
         setShowError(err?.networkError?.result?.errors)
       })
   }
+
   const handleChange = (e) => {
     const { name, value } = e.target
     setProductData([])
     // console.log(name, value)
 
-    router.replace(`/car-finder/catalog?view=grid&${name}=${value}`)
+    // router.replace(`/car-finder/catalog?view=grid&${name}=${value}`)
 
-    const queryParam = `${name}=${value}`
-    const newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?${queryParam}`
-    window.history.pushState({ path: newUrl }, '', newUrl)
+    // const queryParam = `${name}=${value}`
+    // const newUrl = `${window.location.protocol}//${window.location.host}${window.location.pathname}?${queryParam}`
+    // window.history.pushState({ path: newUrl }, '', newUrl)
 
-    console.log(queryParam)
+    // console.log(queryParam)
 
     // if (name === 'model') {
     //   setWhere({
@@ -202,6 +203,37 @@ const CatalogPage = () => {
     //     },
     //   })
     // }
+
+    if (name === 'country') {
+      const value = { country: { slug: { contains: e.target.value } } }
+      localStorage.setItem('searchObj', JSON.stringify(value))
+      router.push(`/car-finder/catalog?view=grid&country=${e.target.value}`)
+    }
+
+    if (name === 'brand') {
+      const value = {
+        product: { brand: { slug: { contains: e.target.value } } },
+      }
+      localStorage.setItem('searchObj', JSON.stringify(value))
+      router.push(`/car-finder/catalog?view=grid&brand=${e.target.value}`)
+    }
+
+    if (name === 'model') {
+      const value = {
+        product: {
+          productSpecifications: {
+            some: {
+              specificationValue: {
+                slug: { eq: e.target.value },
+                specification: { slug: { contains: 'model' } },
+              },
+            },
+          },
+        },
+      }
+      localStorage.setItem('searchObjModel', JSON.stringify(value))
+      router.push(`/car-finder/catalog?view=grid&model=${e.target.value}`)
+    }
 
     if (newSearch) {
       if (newSearch === 'new') {
@@ -921,17 +953,18 @@ const CatalogPage = () => {
                 <div className='pb-4 mb-2'>
                   <h3 className='h6 text-light'>Country</h3>
                   <Form.Select
-                    name='country'
-                    defaultValue='any'
-                    onChange={(e) =>
-                      setWhere((curr) => {
-                        return {
-                          ...curr,
-                          country: { slug: { contains: e.target.value } },
-                        }
-                      })
-                    }
                     className='form-select-light mb-2'
+                    name='country'
+                    value={router.query.country}
+                    onChange={handleChange}
+                    // onChange={(e) =>
+                    //   setWhere((curr) => {
+                    //     return {
+                    //       ...curr,
+                    //       country: { slug: { contains: e.target.value } },
+                    //     }
+                    //   })
+                    // }
                   >
                     <option defaultValue value='country'>
                       Select Country
@@ -974,17 +1007,19 @@ const CatalogPage = () => {
                   <Form.Select
                     name='brand'
                     defaultValue='any'
+                    value={router.query.brand}
                     className='form-select-light mb-2'
-                    onChange={(e) =>
-                      setWhere((old) => {
-                        return {
-                          ...old,
-                          product: {
-                            brand: { slug: { contains: e.target.value } },
-                          },
-                        }
-                      })
-                    }
+                    onChange={handleChange}
+                    // onChange={(e) =>
+                    //   setWhere((old) => {
+                    //     return {
+                    //       ...old,
+                    //       product: {
+                    //         brand: { slug: { contains: e.target.value } },
+                    //       },
+                    //     }
+                    //   })
+                    // }
                   >
                     <option defaultValue value='brand'>
                       Select Brand
@@ -1001,21 +1036,23 @@ const CatalogPage = () => {
                   <Form.Select
                     name='model'
                     defaultValue='any'
+                    value={router.query.model}
                     className='form-select-light mb-1'
-                    onChange={(e) =>
-                      setWhere({
-                        product: {
-                          productSpecifications: {
-                            some: {
-                              specificationValue: {
-                                slug: { eq: e.target.value },
-                                specification: { slug: { contains: 'model' } },
-                              },
-                            },
-                          },
-                        },
-                      })
-                    }
+                    onChange={handleChange}
+                    // onChange={(e) =>
+                    //   setWhere({
+                    //     product: {
+                    //       productSpecifications: {
+                    //         some: {
+                    //           specificationValue: {
+                    //             slug: { eq: e.target.value },
+                    //             specification: { slug: { contains: 'model' } },
+                    //           },
+                    //         },
+                    //       },
+                    //     },
+                    //   })
+                    // }
                   >
                     <option defaultValue value='model'>
                       Select Model
@@ -2346,3 +2383,11 @@ const CatalogPage = () => {
 }
 
 export default CatalogPage
+
+export async function getServerSideProps({ req, query }) {
+  return {
+    props: {
+      path: query,
+    }, // will be passed to the page component as props
+  }
+}
