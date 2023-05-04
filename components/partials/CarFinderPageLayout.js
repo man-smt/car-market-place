@@ -18,15 +18,14 @@ import SocialButton from '../SocialButton'
 import StarRating from '../StarRating'
 import SignInModalDark from '../partials/SignInModalDark'
 import SignUpModalDark from '../partials/SignUpModalDark'
-import { GET_LOGIN_USER } from '../../graphql/Queries'
+import { GET_LOGIN_USER, LOCATIONS } from '../../graphql/Queries'
 import client from '../../apollo'
-import { isEmpty } from 'lodash'
+import { isEmpty, some } from 'lodash'
 import { AppContext } from '../../provider/AppContext'
 import Form from 'react-bootstrap/Form'
+import { useQuery } from '@apollo/client'
 
 const CarFinderPageLayout = (props) => {
-  const [searchSelectData, setSearchSelectData] = useState({})
-
   const token = localStorage.getItem('token')
 
   const { state, dispatch } = useContext(AppContext)
@@ -48,6 +47,7 @@ const CarFinderPageLayout = (props) => {
   // Sign up modal
   const [signupShow, setSignupShow] = useState(false)
   const handleSignupClose = () => setSignupShow(false)
+  const [locationDropdown, setLocationDropdown] = useState('')
 
   // Swap modals
   const handleSignInToUp = (e) => {
@@ -72,15 +72,24 @@ const CarFinderPageLayout = (props) => {
     localStorage.removeItem('token')
   }
 
-  let obj = {}
+  // let obj = {}
 
-  const handleSelect = (eventKey, e) => {
-    console.log({ eventKey, e })
-    obj = { ...searchSelectData }
-    // console.log(e.target.textContent)
-    // setDropData(e.target.textContent)
-    obj['location'] = eventKey?.toLowerCase()
-    setSearchSelectData(obj)
+  const {
+    data: locationData,
+    loading: locationLoading,
+    error: locationError,
+  } = useQuery(LOCATIONS, {
+    variables: { where: {} },
+    fetchPolicy: 'network-only',
+  })
+
+  const handleSelect = (e) => {
+    setLocationDropdown(e)
+    props.setSearchSelectData({
+      locationSpecifications: {
+        some: { locationValue: { slug: { contains: e } } },
+      },
+    })
   }
 
   const CustomMenu = React.forwardRef(
@@ -114,15 +123,15 @@ const CarFinderPageLayout = (props) => {
     }
   )
 
-  const options = [
-    [null, 'Dallas'], // First element is an icon class, null means no icon
-    [null, 'Chicago'],
-    [null, 'Houston'],
-    [null, 'Las Vegas'],
-    [null, 'Los Angeles'],
-    [null, 'New York'],
-    [null, 'San Francisco'],
-  ]
+  // const options = [
+  //   [null, 'Dallas'], // First element is an icon class, null means no icon
+  //   [null, 'Chicago'],
+  //   [null, 'Houston'],
+  //   [null, 'Las Vegas'],
+  //   [null, 'Los Angeles'],
+  //   [null, 'New York'],
+  //   [null, 'San Francisco'],
+  // ]
 
   function parseJwt(token) {
     console.log(token)
@@ -145,6 +154,8 @@ const CarFinderPageLayout = (props) => {
       })
       .catch((err) => console.log({ err }))
   }
+
+  console.log(locationDropdown, '----------------------')
 
   return (
     <>
@@ -534,26 +545,28 @@ const CarFinderPageLayout = (props) => {
                   id='dropdown-custom-components'
                 >
                   <i className='fi-map-pin' style={{ marginRight: '10px' }}></i>
-                  {searchSelectData['location']
-                    ? searchSelectData['location']
-                    : 'Location'}
+                  {/* {props.searchSelectData['locationValue']
+                    ? props.searchSelectData['locationValue']
+                    : 'Location'} */}
+                  {locationDropdown || 'Location'}
                 </Dropdown.Toggle>
                 <Dropdown.Menu as={CustomMenu} className='dropMenu'>
-                  {options
-                    ? options.map((option, indx) => (
-                        <Dropdown.Item
-                          key={indx}
-                          eventKey={option[1]}
-                          className='itemDrop'
-                        >
-                          {option[0] && (
+                  {locationData?.locationValues?.items
+                    ? locationData?.locationValues?.items?.map(
+                        (option, indx) => (
+                          <Dropdown.Item
+                            key={indx}
+                            value={option?.name}
+                            eventKey={option.slug}
+                            className='itemDrop'
+                          >
                             <i
-                              className={`${option[0]} fs-lg opacity-60 me-2`}
+                              className={`${option.name} fs-lg opacity-60 me-2`}
                             ></i>
-                          )}
-                          {option[1]}
-                        </Dropdown.Item>
-                      ))
+                            {option.name}
+                          </Dropdown.Item>
+                        )
+                      )
                     : ''}
                 </Dropdown.Menu>
               </Dropdown>

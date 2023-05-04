@@ -695,3 +695,21 @@ export const BRANDS = gql`
     }
   }
 `
+
+export const LOCATIONS = gql`
+  query locationValues(
+    $order: [LocationValueSortInput!]
+    $skip: Int
+    $take: Int
+    $where: LocationValueFilterInput
+  ) {
+    locationValues(order: $order, skip: $skip, take: $take, where: $where) {
+      totalCount
+      items {
+        name
+        slug
+        id
+      }
+    }
+  }
+`

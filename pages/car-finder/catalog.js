@@ -53,6 +53,8 @@ const CatalogPage = (props) => {
   const [newData, setNewData] = useState([])
   const [where, setWhere] = useState({})
 
+  const [searchSelectData, setSearchSelectData] = useState({})
+
   useEffect(() => {
     if (productData?.length <= count) {
       setHasMore(true)
@@ -81,6 +83,14 @@ const CatalogPage = (props) => {
     document.body.classList.add('fixed-bottom-btn')
     return () => body.classList.remove('fixed-bottom-btn')
   }, [])
+
+  useEffect(() => {
+    if (searchSelectData) {
+      setWhere((curr) => {
+        return { ...curr, searchSelectData }
+      })
+    }
+  }, [searchSelectData])
 
   const {
     data,
@@ -655,6 +665,20 @@ const CatalogPage = (props) => {
     }
   }
 
+  if (selected.length) {
+    const value = {
+      advertiseSpecifications: {
+        some: {
+          specificationValue: {
+            slug: { in: selected },
+          },
+        },
+      },
+    }
+    localStorage.setItem('searchObj', JSON.stringify(value))
+    router.push(`/car-finder/catalog?view=grid&vehicle-type=${selected}`)
+  }
+
   const selectOffer = (e) => {
     const { value } = e.target
     if (value === 'newest') {
@@ -907,6 +931,8 @@ const CatalogPage = (props) => {
     <CarFinderPageLayout
       pageTitle={`Catalog ${viewParam === 'list' ? 'List' : 'Grid'}`}
       activeNav='Catalog'
+      setSearchSelectData={setSearchSelectData}
+      searchSelectData={searchSelectData}
     >
       <Container className='mt-5 mb-md-4 py-5'>
         <Row className='py-md-1'>
